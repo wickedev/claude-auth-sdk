@@ -8,7 +8,7 @@ async function build() {
     target: 'node20',
     format: 'cjs',
     outdir: 'dist',
-    external: ['electron'],
+    external: ['electron', '@anthropic-ai/claude-code'],
     logLevel: 'info',
   });
 
