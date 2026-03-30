@@ -1,3 +1,4 @@
+import { type ChildProcess, spawn } from 'node:child_process';
 import path from 'node:path';
 import type { LoginState, LoginStore } from '@claude-auth-sdk/react';
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
@@ -6,6 +7,18 @@ import type { SerializedLoginState } from './src/types.js';
 function findClaudeCodePath(): string {
   const resolved = require.resolve('@anthropic-ai/claude-code/cli.js');
   return resolved.replace('app.asar', 'app.asar.unpacked');
+}
+
+function findHelperExecutable(): string {
+  const frameworksPath = path.join(path.dirname(app.getPath('exe')), '..', 'Frameworks');
+  const appName = path.basename(app.getPath('exe'));
+  const helperPath = path.join(frameworksPath, `${appName} Helper.app`, 'Contents', 'MacOS', `${appName} Helper`);
+  try {
+    require('node:fs').accessSync(helperPath);
+    return helperPath;
+  } catch {
+    return process.execPath;
+  }
 }
 
 
@@ -111,8 +124,26 @@ async function initChat(): Promise<void> {
         options: {
           cwd: app.getPath('home'),
           pathToClaudeCodeExecutable: findClaudeCodePath(),
-          executable: process.execPath as 'node',
-          env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: '1' }),
+          spawnClaudeCodeProcess: ({ args, cwd, env, signal }) => {
+            const childEnv = { ...env, ELECTRON_RUN_AS_NODE: '1' };
+            const child = spawn(findHelperExecutable(), [findClaudeCodePath(), ...args], {
+              cwd,
+              env: childEnv,
+              stdio: ['pipe', 'pipe', 'pipe'],
+              signal,
+              windowsHide: true,
+            });
+            return {
+              stdin: child.stdin!,
+              stdout: child.stdout!,
+              get killed() { return child.killed; },
+              get exitCode() { return child.exitCode; },
+              kill: (sig?: string) => child.kill(sig as NodeJS.Signals),
+              on: child.on.bind(child) as ChildProcess['on'],
+              once: child.once.bind(child) as ChildProcess['once'],
+              off: child.off.bind(child) as ChildProcess['off'],
+            };
+          },
           tools: [],
           maxTurns: 3,
           includePartialMessages: true,

@@ -10,6 +10,7 @@ async function build() {
     outdir: 'dist',
     external: ['electron', '@anthropic-ai/claude-code'],
     logLevel: 'info',
+    legalComments: 'none',
   });
 
   await esbuild.build({
@@ -21,6 +22,7 @@ async function build() {
     outdir: 'dist',
     external: ['electron'],
     logLevel: 'info',
+    legalComments: 'none',
   });
 
   await esbuild.build({
@@ -32,6 +34,7 @@ async function build() {
     outfile: 'dist/renderer.js',
     jsx: 'automatic',
     logLevel: 'info',
+    legalComments: 'none',
   });
 }
 
