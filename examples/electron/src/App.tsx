@@ -33,6 +33,7 @@ interface ChatMessage {
   role: 'user' | 'assistant' | 'error';
   text: string;
   streaming?: boolean;
+  thinking?: boolean;
 }
 
 function Chat() {
@@ -54,7 +55,7 @@ function Chat() {
       setMessages((prev) => {
         const last = prev.at(-1);
         if (last?.role === 'assistant' && last.streaming) {
-          return [...prev.slice(0, -1), { ...last, text: trimmed }];
+          return [...prev.slice(0, -1), { role: 'assistant', text: trimmed, streaming: true }];
         }
         return [...prev, { role: 'assistant', text: trimmed, streaming: true }];
       });
@@ -74,7 +75,7 @@ function Chat() {
 
     const unsubError = window.chatAPI.onError((error) => {
       setMessages((prev) => {
-        const filtered = prev.filter((m) => !m.streaming);
+        const filtered = prev.filter((m) => !m.streaming && !m.thinking);
         return [...filtered, { role: 'error', text: error }];
       });
       streamingRef.current = '';
@@ -91,7 +92,11 @@ function Chat() {
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed || sending) return;
-    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', text: trimmed },
+      { role: 'assistant', text: '', thinking: true, streaming: true },
+    ]);
     setInput('');
     setSending(true);
     streamingRef.current = '';
@@ -127,7 +132,15 @@ function Chat() {
                 {msg.role === 'user' ? 'You' : msg.role === 'error' ? 'Error' : 'Claude'}
                 {msg.streaming && <span className="chat-streaming"> ...</span>}
               </div>
-              <span className="chat-text">{msg.text}</span>
+              {msg.thinking ? (
+                <span className="chat-thinking">
+                  <span className="chat-thinking-dot" />
+                  <span className="chat-thinking-dot" />
+                  <span className="chat-thinking-dot" />
+                </span>
+              ) : (
+                <span className="chat-text">{msg.text}</span>
+              )}
             </div>
           </div>
         ))}

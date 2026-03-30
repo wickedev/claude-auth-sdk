@@ -207,6 +207,12 @@ loginStore.reset();                  // transitions to idle without clearing cre
 
 A pre-built Electron demo app is available on the [Releases](https://github.com/wickedev/claude-auth-sdk/releases) page.
 
+### Screenshots
+
+| Idle | Logging in | Logged in |
+| :---: | :---: | :---: |
+| ![Idle](docs/assets/demo-idle.png) | ![Logging in](docs/assets/demo-logging-in.png) | ![Logged in](docs/assets/demo-logged-in.png) |
+
 | Platform | File |
 | --- | --- |
 | macOS (Apple Silicon) | `Claude Auth SDK-*-arm64.dmg` |

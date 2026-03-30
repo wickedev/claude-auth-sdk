@@ -63,6 +63,11 @@
     .chat-send-btn:hover:not(:disabled) { background: #3db8b0; }
     .chat-abort-btn { background: #ff6b6b; }
     .chat-abort-btn:hover { background: #e05555; }
+    .chat-thinking { display: inline-flex; align-items: center; gap: 4px; padding: 4px 0; }
+    .chat-thinking-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ecdc4; animation: thinking-bounce 1.4s ease-in-out infinite; }
+    .chat-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .chat-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes thinking-bounce { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
