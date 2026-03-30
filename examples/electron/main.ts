@@ -1,16 +1,13 @@
-import { execSync } from 'node:child_process';
 import path from 'node:path';
 import type { LoginState, LoginStore } from '@claude-auth-sdk/react';
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import type { SerializedLoginState } from './src/types.js';
 
-function findClaudeExecutable(): string {
-  try {
-    return execSync('which claude', { encoding: 'utf8' }).trim();
-  } catch {
-    return require.resolve('@anthropic-ai/claude-code/cli.js').replace('app.asar', 'app.asar.unpacked');
-  }
+function findClaudeCodePath(): string {
+  const resolved = require.resolve('@anthropic-ai/claude-code/cli.js');
+  return resolved.replace('app.asar', 'app.asar.unpacked');
 }
+
 
 let win: BrowserWindow | null = null;
 let loginStore: LoginStore;
@@ -113,7 +110,9 @@ async function initChat(): Promise<void> {
         prompt: userMessage,
         options: {
           cwd: app.getPath('home'),
-          pathToClaudeCodeExecutable: findClaudeExecutable(),
+          pathToClaudeCodeExecutable: findClaudeCodePath(),
+          executable: process.execPath as 'node',
+          env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: '1' }),
           tools: [],
           maxTurns: 3,
           includePartialMessages: true,

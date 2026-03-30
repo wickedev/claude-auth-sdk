@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.mjs)|Edit(*.ts)|Edit(*.tsx)|Edit(*.js)|Edit(*.mjs)",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; if [ -f \"$f\" ] && grep -qE 'biome-ignore|eslint-disable' \"$f\"; then echo '{\"decision\":\"block\",\"reason\":\"Lint suppression comments (biome-ignore, eslint-disable) are not allowed. Fix the lint issue properly instead of suppressing it.\"}'; else echo '{}'; fi; }",
+            "statusMessage": "Checking for lint suppression comments..."
+          },
+          {
+            "type": "command",
+            "if": "Write(biome.json)|Edit(biome.json)",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; if [ -f \"$f\" ] && grep -qE \"\\\"off\\\"\" \"$f\"; then echo '{\"decision\":\"block\",\"reason\":\"Setting rules to off in biome.json is not allowed. Fix the code to satisfy the rule instead.\"}'; else echo '{}'; fi; }",
+            "statusMessage": "Checking biome config for off rules..."
+          }
+        ]
+      }
+    ]
+  }
+}
