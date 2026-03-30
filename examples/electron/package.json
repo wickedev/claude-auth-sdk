@@ -28,7 +28,11 @@
     },
     "files": [
       "dist/**/*",
-      "index.html"
+      "index.html",
+      "node_modules/@anthropic-ai/claude-code/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/@anthropic-ai/claude-code/**/*"
     ],
     "mac": {
       "target": [
