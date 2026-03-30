@@ -4,12 +4,31 @@ import type { LoginState, LoginStore } from '@claude-auth-sdk/react';
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import type { SerializedLoginState } from './src/types.js';
 
-function findClaudeExecutable(): string | undefined {
+function findClaudeExecutable(): string {
+  const commonPaths = [
+    '/usr/local/bin/claude',
+    '/opt/homebrew/bin/claude',
+    `${process.env.HOME}/.npm-global/bin/claude`,
+    `${process.env.HOME}/.local/bin/claude`,
+  ];
+
   try {
-    return execSync('which claude', { encoding: 'utf8' }).trim() || undefined;
+    const found = execSync('which claude', { encoding: 'utf8' }).trim();
+    if (found) return found;
   } catch {
-    return undefined;
+    // fall through to common paths
   }
+
+  for (const p of commonPaths) {
+    try {
+      execSync(`test -x "${p}"`);
+      return p;
+    } catch {
+      // continue
+    }
+  }
+
+  throw new Error('Claude CLI not found. Install it first: npm install -g @anthropic-ai/claude-code');
 }
 
 let win: BrowserWindow | null = null;

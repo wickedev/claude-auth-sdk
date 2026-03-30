@@ -203,6 +203,25 @@ loginStore.reset();                  // transitions to idle without clearing cre
 | `LoginStore` | type | Store interface |
 | `LoggedInCredentials` | type | Credential discriminated union |
 
+## Demo app
+
+A pre-built Electron demo app is available on the [Releases](https://github.com/wickedev/claude-auth-sdk/releases) page.
+
+| Platform | File |
+| --- | --- |
+| macOS (Apple Silicon) | `Claude Auth SDK-*-arm64.dmg` |
+| macOS (Intel) | `Claude Auth SDK-*-x64.dmg` |
+| Windows | `Claude Auth SDK Setup *.exe` |
+| Linux | `Claude Auth SDK-*.AppImage` |
+
+### macOS: "damaged and can't be opened"
+
+The app is not code-signed. macOS Gatekeeper blocks unsigned apps by default. To open it, run in Terminal after installing:
+
+```bash
+xattr -cr "/Applications/Claude Auth SDK.app"
+```
+
 ## License
 
 [MIT](LICENSE)
