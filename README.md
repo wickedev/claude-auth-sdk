@@ -124,15 +124,17 @@ function LoginScreen() {
 
 ### State machine
 
-```
-checking ──→ logged_in     (valid credentials found)
-checking ──→ idle          (no credentials or expired)
-idle ──────→ logging_in    (startLogin() called)
-logging_in → logged_in     (login succeeded)
-logging_in → error         (login failed)
-error ─────→ logging_in    (startLogin() called — retry)
-logged_in ─→ idle          (logout() or reset() called)
-error ─────→ idle          (reset() called)
+```mermaid
+stateDiagram-v2
+    [*] --> checking
+    checking --> logged_in : valid credentials found
+    checking --> idle : no credentials or expired
+    idle --> logging_in : startLogin()
+    logging_in --> logged_in : login succeeded
+    logging_in --> error : login failed
+    error --> logging_in : startLogin() — retry
+    logged_in --> idle : logout() / reset()
+    error --> idle : reset()
 ```
 
 | Status | Fields | Description |
