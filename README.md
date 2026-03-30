@@ -2,6 +2,16 @@
 
 TypeScript SDK for Claude authentication. Handles OAuth login, credential storage, and React state management.
 
+## Example app
+
+A pre-built Electron example app is available on the [Releases](https://github.com/wickedev/claude-auth-sdk/releases) page. Source code is in [`examples/electron/`](examples/electron/).
+
+### Screenshots
+
+| Idle | Logging in | Logged in |
+| :---: | :---: | :---: |
+| ![Idle](docs/assets/demo-idle.png) | ![Logging in](docs/assets/demo-logging-in.png) | ![Logged in](docs/assets/demo-logged-in.png) |
+
 ## Install
 
 ```bash
@@ -202,23 +212,6 @@ loginStore.reset();                  // transitions to idle without clearing cre
 | `LoginState` | type | FSM state union |
 | `LoginStore` | type | Store interface |
 | `LoggedInCredentials` | type | Credential discriminated union |
-
-## Demo app
-
-A pre-built Electron demo app is available on the [Releases](https://github.com/wickedev/claude-auth-sdk/releases) page.
-
-### Screenshots
-
-| Idle | Logging in | Logged in |
-| :---: | :---: | :---: |
-| ![Idle](docs/assets/demo-idle.png) | ![Logging in](docs/assets/demo-logging-in.png) | ![Logged in](docs/assets/demo-logged-in.png) |
-
-| Platform | File |
-| --- | --- |
-| macOS (Apple Silicon) | `Claude Auth SDK-*-arm64.dmg` |
-| macOS (Intel) | `Claude Auth SDK-*-x64.dmg` |
-| Windows | `Claude Auth SDK Setup *.exe` |
-| Linux | `Claude Auth SDK-*.AppImage` |
 
 ### macOS: "damaged and can't be opened"
 
