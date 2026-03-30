@@ -36,9 +36,11 @@ jobs:
           npm run build -w @claude-auth-sdk/core
           npm run build -w @claude-auth-sdk/react
 
-      - name: Install electron app dependencies (no hoist)
-        working-directory: examples/electron
-        run: npm install --install-strategy=nested
+      - name: Reinstall app-builder-bin with platform binaries
+        shell: bash
+        run: |
+          rm -rf node_modules/app-builder-bin
+          npm install app-builder-bin
 
       - name: Build Electron app
         working-directory: examples/electron
