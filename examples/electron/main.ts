@@ -5,31 +5,11 @@ import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import type { SerializedLoginState } from './src/types.js';
 
 function findClaudeExecutable(): string {
-  const commonPaths = [
-    '/usr/local/bin/claude',
-    '/opt/homebrew/bin/claude',
-    `${process.env.HOME}/.npm-global/bin/claude`,
-    `${process.env.HOME}/.local/bin/claude`,
-  ];
-
   try {
-    const found = execSync('which claude', { encoding: 'utf8' }).trim();
-    if (found) return found;
+    return execSync('which claude', { encoding: 'utf8' }).trim();
   } catch {
-    // fall through to common paths
+    return require.resolve('@anthropic-ai/claude-code/cli.js');
   }
-
-  for (const p of commonPaths) {
-    try {
-      execSync(`test -x "${p}"`);
-      return p;
-    } catch {
-      // continue
-    }
-  }
-
-  // Fallback: bundled @anthropic-ai/claude-code
-  return require.resolve('@anthropic-ai/claude-code/cli.js');
 }
 
 let win: BrowserWindow | null = null;
