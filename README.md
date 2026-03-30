@@ -202,3 +202,7 @@ loginStore.reset();                  // transitions to idle without clearing cre
 | `LoginState` | type | FSM state union |
 | `LoginStore` | type | Store interface |
 | `LoggedInCredentials` | type | Credential discriminated union |
+
+## License
+
+[MIT](LICENSE)
