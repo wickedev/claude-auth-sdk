@@ -66,6 +66,7 @@ async function initLoginStore(): Promise<void> {
 
 async function initChat(): Promise<void> {
   let activeQuery: AsyncGenerator | null = null;
+  let currentSessionId: string | null = null;
   const { query, tool, createSdkMcpServer } = await import('@anthropic-ai/claude-agent-sdk');
   const { z } = await import('zod');
 
@@ -121,6 +122,7 @@ async function initChat(): Promise<void> {
     try {
       activeQuery = query({
         prompt: userMessage,
+        ...(currentSessionId ? { resume: currentSessionId } : {}),
         options: {
           cwd: app.getPath('home'),
           pathToClaudeCodeExecutable: findClaudeCodePath(),
@@ -157,6 +159,11 @@ async function initChat(): Promise<void> {
 
       for await (const msg of activeQuery) {
         const m = msg as Record<string, unknown>;
+
+        // Capture session ID for conversation continuity
+        if (typeof m.session_id === 'string' && !currentSessionId) {
+          currentSessionId = m.session_id;
+        }
 
         // SDK authentication failure
         if (m.error === 'authentication_failed') {
@@ -223,6 +230,10 @@ async function initChat(): Promise<void> {
       void activeQuery.return(undefined);
       activeQuery = null;
     }
+  });
+
+  ipcMain.handle('chat:clear', () => {
+    currentSessionId = null;
   });
 }
 

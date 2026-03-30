@@ -36,8 +36,13 @@ interface ChatMessage {
   thinking?: boolean;
 }
 
-function Chat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+function Chat({
+  messages,
+  setMessages,
+}: {
+  messages: ChatMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+}) {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const streamingRef = useRef('');
@@ -87,7 +92,7 @@ function Chat() {
       unsubDone();
       unsubError();
     };
-  }, []);
+  }, [setMessages]);
 
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
@@ -101,7 +106,7 @@ function Chat() {
     setSending(true);
     streamingRef.current = '';
     void window.chatAPI.send(trimmed);
-  }, [input, sending]);
+  }, [input, sending, setMessages]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -205,6 +210,13 @@ function formatCredentials(credentials: SerializedCredentials): string {
 
 export default function App() {
   const { state, startLogin, logout, reset } = useLoginState();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  const handleLogout = useCallback(() => {
+    void window.chatAPI.clear();
+    setMessages([]);
+    logout();
+  }, [logout]);
 
   return (
     <div className="app">
@@ -295,11 +307,11 @@ export default function App() {
             <span>
               <code>{formatCredentials(state.credentials)}</code>
             </span>
-            <button type="button" className="logout-btn" onClick={logout}>
+            <button type="button" className="logout-btn" onClick={handleLogout}>
               Log out
             </button>
           </div>
-          <Chat />
+          <Chat messages={messages} setMessages={setMessages} />
         </div>
       )}
 
