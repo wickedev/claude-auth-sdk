@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>claude-auth-sdk demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; background: #1a1a2e; color: #e0e0e0; height: 100vh; }
+    #root { height: 100vh; }
+    .app { display: flex; flex-direction: column; height: 100%; padding: 1.5rem; }
+    .app-header { flex-shrink: 0; }
+    h1 { color: #fff; margin: 0 0 0.25rem 0; font-size: 1.4rem; }
+    .status { font-size: 0.85rem; color: #888; margin: 0 0 1rem 0; }
+    .status strong { color: #7c8aff; }
+    button { padding: 0.5rem 1rem; border: none; border-radius: 6px; background: #7c8aff; color: #fff; font-size: 0.9rem; cursor: pointer; }
+    button:disabled { background: #444; cursor: not-allowed; }
+    button:hover:not(:disabled) { background: #5c6adf; }
+    .error { color: #ff6b6b; }
+    code { background: #2a2a3e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.8rem; }
+    /* Login screen */
+    .login-screen { display: flex; flex-direction: column; align-items: center; margin-top: 1rem; }
+    .login-art { color: #888; font-family: 'Menlo', 'Courier New', monospace; font-size: 0.7rem; line-height: 1.2; text-align: center; margin-bottom: 1rem; }
+    .login-desc { color: #aaa; text-align: center; font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .login-question { color: #ccc; text-align: center; font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; }
+    .login-btn { display: block; width: 100%; max-width: 360px; padding: 0.85rem; border: 1px solid #444; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; text-align: center; margin-bottom: 0.25rem; }
+    .login-btn-claudeai { background: #e07b39; border-color: #e07b39; color: #fff; }
+    .login-btn-claudeai:hover { background: #c0612a; }
+    .login-btn-console { background: transparent; border-color: #555; color: #e0e0e0; }
+    .login-btn-console:hover { background: #2a2a3e; }
+    .login-hint { color: #777; font-size: 0.8rem; text-align: center; margin: 0 0 1rem 0; }
+
+    .console-btn { background: #e07b39; margin-left: 0.5rem; }
+    .console-btn:hover { background: #c0612a; }
+
+    /* Logged-in layout */
+    .logged-in-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .logged-in-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: #2a2a3e; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.85rem; flex-shrink: 0; }
+    .logout-btn { background: #555; padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+    .logout-btn:hover { background: #666; }
+
+    /* Chat */
+    .chat-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 0.5rem; border: 1px solid #2a2a3e; border-radius: 6px; margin-bottom: 0.75rem; }
+    .chat-empty { color: #555; text-align: center; margin-top: 2rem; }
+    .chat-msg { margin-bottom: 0.75rem; line-height: 1.5; display: flex; flex-direction: column; }
+    .chat-bubble { padding: 0.6rem 0.85rem; border-radius: 12px; max-width: 80%; }
+    .chat-role { font-weight: 600; font-size: 0.75rem; margin-bottom: 0.2rem; }
+    .chat-text { white-space: pre-wrap; word-break: break-word; font-size: 0.9rem; }
+    .chat-msg-user { align-items: flex-end; }
+    .chat-msg-user .chat-bubble { background: #3a3a6e; border-bottom-right-radius: 4px; }
+    .chat-msg-user .chat-role { color: #7c8aff; }
+    .chat-msg-assistant { align-items: flex-start; }
+    .chat-msg-assistant .chat-bubble { background: #2a2a3e; border-bottom-left-radius: 4px; }
+    .chat-msg-assistant .chat-role { color: #4ecdc4; }
+    .chat-msg-error { align-items: flex-start; }
+    .chat-msg-error .chat-bubble { background: #3e2a2a; }
+    .chat-msg-error .chat-role { color: #ff6b6b; }
+    .chat-msg-error .chat-text { color: #ff6b6b; }
+    .chat-input-row { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .chat-input { flex: 1; padding: 0.6rem; border: 1px solid #333; border-radius: 6px; background: #2a2a3e; color: #e0e0e0; font-size: 0.9rem; font-family: inherit; resize: none; outline: none; }
+    .chat-input:focus { border-color: #7c8aff; }
+    .chat-send-btn { background: #4ecdc4; }
+    .chat-send-btn:hover:not(:disabled) { background: #3db8b0; }
+    .chat-abort-btn { background: #ff6b6b; }
+    .chat-abort-btn:hover { background: #e05555; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="dist/renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "electron-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsx build.ts",
+    "start": "npm run build && npx electron .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.2.87",
+    "@claude-auth-sdk/core": "0.1.0",
+    "@claude-auth-sdk/react": "0.1.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.1.6",
+    "electron": "^35.0.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3"
+  }
+}

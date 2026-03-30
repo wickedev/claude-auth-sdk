@@ -1,0 +1,15 @@
+{
+  "name": "node-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "try-login": "tsx try-login.ts"
+  },
+  "dependencies": {
+    "@claude-auth-sdk/core": "0.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
