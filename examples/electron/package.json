@@ -1,5 +1,5 @@
 {
-  "name": "electron-example",
+  "name": "claude-auth-sdk-app",
   "version": "1.0.0",
   "private": true,
   "type": "commonjs",
@@ -7,7 +7,44 @@
   "scripts": {
     "build": "tsx build.ts",
     "start": "npm run build && npx electron .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.claude-auth-sdk.app",
+    "productName": "Claude Auth SDK",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "index.html"
+    ],
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] }
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] }
+      ],
+      "category": "Development"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    }
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.2.87",
@@ -20,6 +57,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.1.6",
     "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
     "esbuild": "^0.25.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.3"
