@@ -2,6 +2,12 @@
   "name": "claude-auth-sdk-app",
   "version": "1.0.0",
   "private": true,
+  "description": "Claude Auth SDK demo app",
+  "author": "Claude Auth SDK contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wickedev/claude-auth-sdk.git"
+  },
   "type": "commonjs",
   "main": "dist/main.js",
   "scripts": {
