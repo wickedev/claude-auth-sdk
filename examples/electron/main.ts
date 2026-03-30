@@ -156,13 +156,47 @@ async function initChat(): Promise<void> {
       });
 
       for await (const msg of activeQuery) {
+        const m = msg as Record<string, unknown>;
+
+        // SDK authentication failure
+        if (m.error === 'authentication_failed') {
+          if (win && !win.isDestroyed()) {
+            win.webContents.send('chat:error', 'Session expired. Logging out...');
+          }
+          setTimeout(() => void loginStore.logout(), 2000);
+          return;
+        }
+
+        // SDK auth status event with error
+        if (m.type === 'auth_status' && m.error) {
+          if (win && !win.isDestroyed()) {
+            win.webContents.send('chat:error', 'Authentication failed. Logging out...');
+          }
+          setTimeout(() => void loginStore.logout(), 2000);
+          return;
+        }
+
+        // SDK result with error subtype
+        if (m.type === 'result' && typeof m.subtype === 'string' && m.subtype.startsWith('error')) {
+          const errors = m.errors as string[] | undefined;
+          const isAuthError = errors?.some((e) => /not logged in/i.test(e));
+          if (isAuthError) {
+            if (win && !win.isDestroyed()) {
+              win.webContents.send('chat:error', 'Not logged in. Logging out...');
+            }
+            setTimeout(() => void loginStore.logout(), 2000);
+            return;
+          }
+          if (win && !win.isDestroyed()) {
+            win.webContents.send('chat:error', errors?.join('; ') ?? 'Unknown error');
+          }
+          return;
+        }
+
         if (win && !win.isDestroyed()) {
-          const m = msg as {
-            type?: string;
-            event?: { type?: string; delta?: { type?: string; text?: string } };
-          };
-          if (m.type === 'stream_event' && m.event?.type === 'content_block_delta') {
-            const delta = m.event.delta;
+          const event = (m as { event?: { type?: string; delta?: { type?: string; text?: string } } }).event;
+          if (m.type === 'stream_event' && event?.type === 'content_block_delta') {
+            const delta = event.delta;
             if (delta?.type === 'text_delta' && delta.text) {
               win.webContents.send('chat:delta', delta.text);
             }
