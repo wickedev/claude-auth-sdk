@@ -49,6 +49,17 @@ jobs:
           rm -rf node_modules/app-builder-bin
           npm install app-builder-bin
 
+      - name: Replace workspace symlinks with copies
+        shell: bash
+        run: |
+          for pkg in node_modules/@claude-auth-sdk/core node_modules/@claude-auth-sdk/react; do
+            if [ -L "$pkg" ]; then
+              target=$(readlink -f "$pkg")
+              rm "$pkg"
+              cp -r "$target" "$pkg"
+            fi
+          done
+
       - name: Build Electron app
         working-directory: examples/electron
         run: npm run ${{ matrix.script }} -- --publish never
