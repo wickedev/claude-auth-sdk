@@ -30,17 +30,13 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install root dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm install
 
       - name: Build packages
         run: |
           npm run build -w @claude-auth-sdk/core
           npm run build -w @claude-auth-sdk/react
-
-      - name: Install electron-builder
-        working-directory: examples/electron
-        run: npm install electron-builder
 
       - name: Build Electron app
         working-directory: examples/electron
