@@ -15,7 +15,7 @@ npm install @claude-auth-sdk/react  # optional, for React apps
 import { login } from '@claude-auth-sdk/core';
 
 const result = await login('claudeai');
-// Opens browser → user authenticates → credentials stored in ~/.claude/
+// Opens browser → user authenticates → credentials stored in OS credential store (fallback: ~/.claude/.credentials.json)
 ```
 
 ## Login
