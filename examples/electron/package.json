@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.2.87",
+    "@anthropic-ai/claude-code": "2.1.87",
     "@claude-auth-sdk/core": "0.1.0",
     "@claude-auth-sdk/react": "0.1.0",
     "react": "^18.3.0",

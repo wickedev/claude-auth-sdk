@@ -28,7 +28,8 @@ function findClaudeExecutable(): string {
     }
   }
 
-  throw new Error('Claude CLI not found. Install it first: npm install -g @anthropic-ai/claude-code');
+  // Fallback: bundled @anthropic-ai/claude-code
+  return require.resolve('@anthropic-ai/claude-code/cli.js');
 }
 
 let win: BrowserWindow | null = null;
