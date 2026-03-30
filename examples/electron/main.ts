@@ -8,7 +8,7 @@ function findClaudeExecutable(): string {
   try {
     return execSync('which claude', { encoding: 'utf8' }).trim();
   } catch {
-    return require.resolve('@anthropic-ai/claude-code/cli.js');
+    return require.resolve('@anthropic-ai/claude-code/cli.js').replace('app.asar', 'app.asar.unpacked');
   }
 }
 
