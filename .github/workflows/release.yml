@@ -30,17 +30,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build packages
+      - name: Install and build SDK packages
         run: |
+          npm install
           npm run build -w @claude-auth-sdk/core
           npm run build -w @claude-auth-sdk/react
 
-      - name: Rebuild native modules for electron-builder
+      - name: Install electron app dependencies (no hoist)
         working-directory: examples/electron
-        run: npm rebuild app-builder-bin
+        run: npm install --install-strategy=nested
 
       - name: Build Electron app
         working-directory: examples/electron
