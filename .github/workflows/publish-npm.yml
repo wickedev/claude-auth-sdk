@@ -70,26 +70,46 @@ jobs:
       - name: Build publishable packages
         run: npm run build -w @claude-auth-sdk/core -w @claude-auth-sdk/react
 
-      - name: Verify release versions are not already published
+      - name: Check release publish state
+        id: publish_state
         env:
           RELEASE_VERSION: ${{ github.ref_name }}
         run: |
           VERSION="${RELEASE_VERSION#v}"
 
+          core_published=false
+          react_published=false
+
           if npm view @claude-auth-sdk/core@"$VERSION" version >/dev/null 2>&1; then
-            echo "@claude-auth-sdk/core@$VERSION is already published"
-            exit 1
+            core_published=true
           fi
 
           if npm view @claude-auth-sdk/react@"$VERSION" version >/dev/null 2>&1; then
-            echo "@claude-auth-sdk/react@$VERSION is already published"
+            react_published=true
+          fi
+
+          echo "core_published=$core_published" >> "$GITHUB_OUTPUT"
+          echo "react_published=$react_published" >> "$GITHUB_OUTPUT"
+
+          if [ "$core_published" = true ] && [ "$react_published" = true ]; then
+            echo "all_published=true" >> "$GITHUB_OUTPUT"
+            echo "Both packages are already published for $VERSION; skipping publish steps."
+            exit 0
+          fi
+
+          echo "all_published=false" >> "$GITHUB_OUTPUT"
+
+          if [ "$core_published" = true ] || [ "$react_published" = true ]; then
+            echo "Detected partial publish state for $VERSION. Refusing to continue automatically."
             exit 1
           fi
 
       - name: Publish core package
+        if: steps.publish_state.outputs.all_published != 'true'
         run: npm publish -w @claude-auth-sdk/core
 
       - name: Wait for core package to appear in npm registry
+        if: steps.publish_state.outputs.all_published != 'true'
         env:
           RELEASE_VERSION: ${{ github.ref_name }}
         run: |
@@ -108,6 +128,7 @@ jobs:
           exit 1
 
       - name: Publish react package
+        if: steps.publish_state.outputs.all_published != 'true'
         run: npm publish -w @claude-auth-sdk/react
 
       - name: Verify published versions
@@ -115,7 +136,21 @@ jobs:
           RELEASE_VERSION: ${{ github.ref_name }}
         run: |
           VERSION="${RELEASE_VERSION#v}"
-          npm view @claude-auth-sdk/core version
-          npm view @claude-auth-sdk/core@"$VERSION" version
-          npm view @claude-auth-sdk/react version
-          npm view @claude-auth-sdk/react@"$VERSION" version
+
+          for pkg in @claude-auth-sdk/core @claude-auth-sdk/react; do
+            for attempt in $(seq 1 24); do
+              if npm view "$pkg@${VERSION}" version >/dev/null 2>&1; then
+                npm view "$pkg" version
+                npm view "$pkg@${VERSION}" version
+                break
+              fi
+
+              if [ "$attempt" -eq 24 ]; then
+                echo "Timed out waiting for $pkg@$VERSION to appear in npm registry"
+                exit 1
+              fi
+
+              echo "Waiting for $pkg@$VERSION to become visible in npm registry..."
+              sleep 5
+            done
+          done
