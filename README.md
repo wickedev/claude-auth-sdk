@@ -1,5 +1,8 @@
 # claude-auth-sdk
 
+[![npm version for @claude-auth-sdk/core](https://img.shields.io/npm/v/%40claude-auth-sdk%2Fcore?label=%40claude-auth-sdk%2Fcore)](https://www.npmjs.com/package/@claude-auth-sdk/core)
+[![npm version for @claude-auth-sdk/react](https://img.shields.io/npm/v/%40claude-auth-sdk%2Freact?label=%40claude-auth-sdk%2Freact)](https://www.npmjs.com/package/@claude-auth-sdk/react)
+
 TypeScript SDK for Claude authentication. Handles OAuth login, credential storage, and React state management.
 
 ## Example app
