@@ -1,0 +1,121 @@
+name: Publish npm Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: publish-npm-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate npm token
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is required to publish packages."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set package versions from git tag
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+          node <<'EOF'
+          const fs = require('node:fs');
+
+          const version = process.env.RELEASE_VERSION.replace(/^v/, '');
+          const corePath = 'packages/core/package.json';
+          const reactPath = 'packages/react/package.json';
+
+          const core = JSON.parse(fs.readFileSync(corePath, 'utf8'));
+          core.version = version;
+          core.publishConfig = { ...(core.publishConfig ?? {}), access: 'public' };
+          fs.writeFileSync(corePath, `${JSON.stringify(core, null, 2)}\n`);
+
+          const react = JSON.parse(fs.readFileSync(reactPath, 'utf8'));
+          react.version = version;
+          react.publishConfig = { ...(react.publishConfig ?? {}), access: 'public' };
+          react.peerDependencies = {
+            ...(react.peerDependencies ?? {}),
+            '@claude-auth-sdk/core': `^${version}`,
+          };
+          react.devDependencies = {
+            ...(react.devDependencies ?? {}),
+            '@claude-auth-sdk/core': version,
+          };
+          fs.writeFileSync(reactPath, `${JSON.stringify(react, null, 2)}\n`);
+          EOF
+
+      - name: Build publishable packages
+        run: npm run build -w @claude-auth-sdk/core -w @claude-auth-sdk/react
+
+      - name: Verify release versions are not already published
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+
+          if npm view @claude-auth-sdk/core@"$VERSION" version >/dev/null 2>&1; then
+            echo "@claude-auth-sdk/core@$VERSION is already published"
+            exit 1
+          fi
+
+          if npm view @claude-auth-sdk/react@"$VERSION" version >/dev/null 2>&1; then
+            echo "@claude-auth-sdk/react@$VERSION is already published"
+            exit 1
+          fi
+
+      - name: Publish core package
+        run: npm publish -w @claude-auth-sdk/core
+
+      - name: Wait for core package to appear in npm registry
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+
+          for attempt in $(seq 1 24); do
+            if npm view @claude-auth-sdk/core@"$VERSION" version >/dev/null 2>&1; then
+              exit 0
+            fi
+
+            echo "Waiting for @claude-auth-sdk/core@$VERSION to become visible in npm registry..."
+            sleep 5
+          done
+
+          echo "Timed out waiting for @claude-auth-sdk/core@$VERSION to appear in npm registry"
+          exit 1
+
+      - name: Publish react package
+        run: npm publish -w @claude-auth-sdk/react
+
+      - name: Verify published versions
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+          npm view @claude-auth-sdk/core version
+          npm view @claude-auth-sdk/core@"$VERSION" version
+          npm view @claude-auth-sdk/react version
+          npm view @claude-auth-sdk/react@"$VERSION" version
