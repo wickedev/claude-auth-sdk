@@ -3,7 +3,9 @@
 [![npm version for @claude-auth-sdk/core](https://img.shields.io/npm/v/%40claude-auth-sdk%2Fcore?label=%40claude-auth-sdk%2Fcore)](https://www.npmjs.com/package/@claude-auth-sdk/core)
 [![npm version for @claude-auth-sdk/react](https://img.shields.io/npm/v/%40claude-auth-sdk%2Freact?label=%40claude-auth-sdk%2Freact)](https://www.npmjs.com/package/@claude-auth-sdk/react)
 
-TypeScript SDK for Claude authentication. Handles OAuth login, credential storage, and React state management.
+UI-first Claude authentication for apps that use `@anthropic-ai/claude-agent-sdk`.
+
+`@anthropic-ai/claude-agent-sdk` can work with local BYOK flows, but it does not provide a Claude login experience. Users still have to leave your product and log in from the terminal. `claude-auth-sdk` is the missing piece: it brings Claude login into your app's UI, stores credentials locally, and gives you React primitives for a complete auth flow.
 
 ## Example app
 
