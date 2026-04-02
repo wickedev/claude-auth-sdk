@@ -30,7 +30,17 @@ const t=setInterval(()=>{n--;if(n>0){c.textContent=n}else{clearInterval(t);windo
 </body></html>`;
 
 export async function startCallbackServer(): Promise<CallbackServerHandle> {
+  let pendingCallback: CallbackParams | undefined;
   let resolveCallback: ((params: CallbackParams) => void) | undefined;
+  let timeoutHandle: NodeJS.Timeout | undefined;
+
+  function clearPendingWait(): void {
+    if (timeoutHandle !== undefined) {
+      clearTimeout(timeoutHandle);
+      timeoutHandle = undefined;
+    }
+    resolveCallback = undefined;
+  }
 
   const server = createServer((req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
@@ -48,10 +58,18 @@ export async function startCallbackServer(): Promise<CallbackServerHandle> {
       errorDescription: url.searchParams.get('error_description') ?? undefined,
     };
 
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.shouldKeepAlive = false;
+    res.writeHead(200, { 'Content-Type': 'text/html', Connection: 'close' });
     res.end(SUCCESS_HTML);
 
-    resolveCallback?.(params);
+    if (resolveCallback !== undefined) {
+      const resolve = resolveCallback;
+      clearPendingWait();
+      resolve(params);
+      return;
+    }
+
+    pendingCallback = params;
   });
 
   const port = await new Promise<number>((resolve, reject) => {
@@ -69,20 +87,27 @@ export async function startCallbackServer(): Promise<CallbackServerHandle> {
     port,
 
     waitForCallback(timeoutMs = DEFAULT_TIMEOUT_MS): Promise<CallbackParams> {
+      if (pendingCallback !== undefined) {
+        const buffered = pendingCallback;
+        pendingCallback = undefined;
+        return Promise.resolve(buffered);
+      }
+
       return new Promise<CallbackParams>((resolve, reject) => {
         resolveCallback = resolve;
 
-        const timer = setTimeout(() => {
-          resolveCallback = undefined;
+        timeoutHandle = setTimeout(() => {
+          clearPendingWait();
           reject(new Error('Login timeout: no callback received'));
         }, timeoutMs);
 
-        timer.unref();
+        timeoutHandle.unref();
       });
     },
 
     close(): Promise<void> {
       return new Promise<void>((resolve) => {
+        server.closeIdleConnections?.();
         server.close(() => {
           resolve();
         });

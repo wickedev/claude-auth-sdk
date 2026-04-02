@@ -3,6 +3,11 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@claude-auth-sdk/core": ["../../packages/core/src/index.ts"],
+      "@claude-auth-sdk/react": ["../../packages/react/src/index.ts"]
+    },
     "lib": ["ES2022", "DOM"],
     "strict": true,
     "skipLibCheck": true,

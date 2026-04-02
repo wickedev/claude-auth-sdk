@@ -1,4 +1,11 @@
+import path from 'node:path';
 import esbuild from 'esbuild';
+
+const repoRoot = path.resolve(process.cwd(), '..', '..');
+const localWorkspaceAliases = {
+  '@claude-auth-sdk/core': path.join(repoRoot, 'packages/core/src/index.ts'),
+  '@claude-auth-sdk/react': path.join(repoRoot, 'packages/react/src/index.ts'),
+};
 
 async function build() {
   await esbuild.build({
@@ -9,6 +16,7 @@ async function build() {
     format: 'cjs',
     outdir: 'dist',
     external: ['electron', '@anthropic-ai/claude-code'],
+    alias: localWorkspaceAliases,
     logLevel: 'info',
     legalComments: 'none',
   });
@@ -21,6 +29,7 @@ async function build() {
     format: 'cjs',
     outdir: 'dist',
     external: ['electron'],
+    alias: localWorkspaceAliases,
     logLevel: 'info',
     legalComments: 'none',
   });
@@ -33,6 +42,7 @@ async function build() {
     format: 'iife',
     outfile: 'dist/renderer.js',
     jsx: 'automatic',
+    alias: localWorkspaceAliases,
     logLevel: 'info',
     legalComments: 'none',
   });
