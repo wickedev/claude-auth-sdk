@@ -1,0 +1,33 @@
+{
+  "name": "claude-auth-sdk-vite-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"node --experimental-strip-types server.ts\" \"vite\"",
+    "dev:server": "node --experimental-strip-types server.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@claude-auth-sdk/core": "0.1.0",
+    "@claude-auth-sdk/react": "0.1.0",
+    "react": "^18.3.0",
+    "@anthropic-ai/claude-agent-sdk": "0.2.87",
+    "react-dom": "^18.3.0",
+    "ws": "^8.20.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4"
+  }
+}

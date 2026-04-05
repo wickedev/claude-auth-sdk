@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@claude-auth-sdk/core": ["../../packages/core/src/index.ts"],
+      "@claude-auth-sdk/core/browser": ["../../packages/core/src/browser.ts"],
+      "@claude-auth-sdk/react": ["../../packages/react/src/index.ts"]
+    }
+  },
+  "include": ["src", "server.ts", "vite-env.d.ts"]
+}
