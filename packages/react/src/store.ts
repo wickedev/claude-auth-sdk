@@ -4,13 +4,8 @@ import type {
   LoginResult,
   OAuthCredentialBundle,
   StoredCredentialEnvelope,
-} from '@claude-auth-sdk/core';
-import {
-  LoginError,
-  createNodeDefaultStorageAdapter,
-  login as defaultLogin,
-  openBrowser,
-} from '@claude-auth-sdk/core';
+} from '@claude-auth-sdk/core/browser';
+import { LoginError } from '@claude-auth-sdk/core/browser';
 
 export type LoggedInCredentials =
   | { type: 'oauth'; credentials: OAuthCredentialBundle }
@@ -38,27 +33,14 @@ type ClearFn = () => Promise<void>;
 type OpenBrowserFn = (url: string) => Promise<boolean>;
 
 export interface LoginStoreDeps {
-  loginFn?: LoginFn;
-  readFn?: ReadFn;
-  clearFn?: ClearFn;
-  openBrowserFn?: OpenBrowserFn;
+  loginFn: LoginFn;
+  readFn: ReadFn;
+  clearFn: ClearFn;
+  openBrowserFn: OpenBrowserFn;
 }
 
-const defaultAdapter = createNodeDefaultStorageAdapter();
-
-function defaultReadFn(): Promise<StoredCredentialEnvelope | null> {
-  return defaultAdapter.read();
-}
-
-function defaultClearFn(): Promise<void> {
-  return defaultAdapter.clear();
-}
-
-export function createLoginStore(deps: LoginStoreDeps = {}): LoginStore {
-  const loginFn = deps.loginFn ?? defaultLogin;
-  const readFn = deps.readFn ?? defaultReadFn;
-  const clearFn = deps.clearFn ?? defaultClearFn;
-  const openBrowserFn = deps.openBrowserFn ?? openBrowser;
+export function createLoginStore(deps: LoginStoreDeps): LoginStore {
+  const { loginFn, readFn, clearFn, openBrowserFn } = deps;
 
   let currentState: LoginState = { status: 'checking' };
   const listeners = new Set<() => void>();
@@ -168,5 +150,3 @@ export function createLoginStore(deps: LoginStoreDeps = {}): LoginStore {
     },
   };
 }
-
-export const loginStore: LoginStore = createLoginStore();

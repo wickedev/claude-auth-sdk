@@ -9,5 +9,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   outDir: 'dist',
-  external: ['react', '@claude-auth-sdk/core'],
+  external: ['react', '@claude-auth-sdk/core', '@claude-auth-sdk/core/browser'],
 });

@@ -1,6 +1,8 @@
 import { type ChildProcess, spawn } from 'node:child_process';
 import path from 'node:path';
+import { createNodeDefaultStorageAdapter, login, openBrowser } from '@claude-auth-sdk/core';
 import type { LoginState, LoginStore } from '@claude-auth-sdk/react';
+import { createLoginStore } from '@claude-auth-sdk/react';
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import type { SerializedLoginState } from './src/types.js';
 
@@ -36,8 +38,13 @@ function serializeState(state: LoginState): SerializedLoginState {
 }
 
 async function initLoginStore(): Promise<void> {
-  const sdk = await import('@claude-auth-sdk/react');
-  loginStore = sdk.loginStore;
+  const adapter = createNodeDefaultStorageAdapter();
+  loginStore = createLoginStore({
+    loginFn: login,
+    readFn: () => adapter.read(),
+    clearFn: () => adapter.clear(),
+    openBrowserFn: openBrowser,
+  });
 
   loginStore.subscribe(() => {
     if (win && !win.isDestroyed()) {
