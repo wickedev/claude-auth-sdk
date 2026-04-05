@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org
 
       - name: Validate npm token
@@ -35,6 +35,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Fix cross-platform optional deps (npm/cli#4828)
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Set package versions from git tag
         env:

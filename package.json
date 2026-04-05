@@ -16,7 +16,11 @@
     "lint:fix": "biome check --write packages/ examples/",
     "publish:all": "npm run build -w @claude-auth-sdk/core -w @claude-auth-sdk/react && npm publish --access public -w @claude-auth-sdk/core && npm publish --access public -w @claude-auth-sdk/react"
   },
+  "overrides": {
+    "esbuild": "^0.27.4"
+  },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4"
+    "@biomejs/biome": "1.9.4",
+    "esbuild": "^0.27.4"
   }
 }
